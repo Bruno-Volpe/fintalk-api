@@ -103,13 +103,78 @@ const sendEmail = async (req, res) => {
         }
     })
 
-    const token = jwt.sign({ emailForms, code }, 'FHddvve    svcssss   fows11w1 1288#$%c', { expiresIn: '1h' }) //TODO: substituir por dotenv e o tempo de espera
+    const token = jwt.sign({ emailForms, code }, 'SendCodeToken', { expiresIn: '1h' }) //TODO: substituir por dotenv e o tempo de espera
     res.status(200).json(['Email sent successfully!', token])
 }
 
+const checkCode = async (req, res) => {
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+        return res.status(404).json(errorM('User did not request the email'));
+    }
+
+    const [, token] = authorization.split(' ');
+
+
+    try {
+        const { emailForms, code } = jwt.verify(token, "SendCodeToken") //TODO: replace with dotenv
+        if (!code) return res.status(404).json(errorM('User did not request the email'))
+
+        const userCode = req.body.code
+        if (!userCode) return res.status(404).json(errorM('Code not sent'))
+
+        if (Number(userCode) === Number(code)) {
+            const user = await Users.findOne({ where: { email: emailForms } })
+            if (user !== null) {
+                const token = jwt.sign({ email: emailForms, id: user.id }, 'ResetPasswordToken', { expiresIn: '1h' }) //TODO: replace with dotenv
+                return res.status(200).json({ token })
+            }
+
+            return res.status(404).json(errorM('User does not exist!'))
+        }
+        res.status(401).json(errorM('Invalid Code!'))
+    } catch (e) {
+        return res.status(401).json(errorM('Expired or invalid token.'));
+    }
+}
+
+const resetPassword = async (req, res) => {
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+        return res.status(404).json(errorM('User did not validate the email'));
+    }
+
+    const [, token] = authorization.split(' ');
+
+    try {
+        const { email, id } = jwt.verify(token, "ResetPasswordToken") //TODO: replace with dotenv
+        if (!email || !id) return res.status(404).json(errorM('User did not request the email'))
+
+        const user = await Users.findOne({ where: { email } })
+        if (user === null) return res.status(404).json(errorM('User does not exist!'))
+
+        const newPassword = req.body.password
+        if (!newPassword) return res.status(404).json(errorM('Password not sent!'))
+
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+            if (err) {
+                return res.status(500).json(errorM(err))
+            }
+            user.password_hash = hash
+            user.save()
+            return res.status(200).json({ message: 'Password changed successfully!' })
+        })
+    } catch (e) {
+        return res.status(401).json(errorM('Expired or invalid token.'));
+    }
+}
 
 export {
     signIn,
     signUp,
     sendEmail,
+    checkCode,
+    resetPassword,
 }

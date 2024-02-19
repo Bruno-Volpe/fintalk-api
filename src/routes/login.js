@@ -1,12 +1,13 @@
 import { Router } from 'express'
 
-import { signIn, signUp, sendEmail } from '../controllers/Login'
+import { signIn, signUp, sendEmail, checkCode, resetPassword } from '../controllers/Login'
 
 const router = Router()
 
 router.post('/', signIn)
 router.post('/signup', signUp)
-router.post('/send-email', sendEmail)
-
+router.post('/forgot/send-email', sendEmail)
+router.post('/forgot/check-code', checkCode)
+router.put('/forgot/reset-password', resetPassword)
 
 export default router 
