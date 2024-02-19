@@ -67,55 +67,46 @@ const signUp = async (req, res) => {
 }
 
 const sendEmail = async (req, res) => {
-    const { email } = req.body
-    if (!email) {
-        return res.status(400).json(errorM('Email not informed'))
+    const emailForms = req.body.email || null
+    if (!emailForms) return res.status(404).send(errorM('Email not sent'))
+
+    // Check if user exists
+    const user = await Users.findOne({ where: { email: emailForms } })
+    if (!user) {
+        return res.status(404).send(errorM('User not found'))
     }
-    await Users.findOne({ where: { email } })
-        .then(async user => {
-            // Usuario não existe
-            if (!user) {
-                return res.status(404).json(errorM('User not found'))
-            }
 
-            // Usuario existe
-            // Enviar email, com codigo
-            const code = Math.floor(Math.random() * 99999999)
-            const remetente = nodemailer.createTestAccount({
-                host: "smtp.office365.com", // hostname
-                secureConnection: false, // TLS requires secureConnection to be false
-                port: 587, // port for secure SMTP
-                tls: {
-                    ciphers: 'SSLv3'
-                },
-                auth: {
-                    user: 'login.escola@outlook.com',
-                    pass: 'Bv759236'
-                }
-            })
+    const code = Math.floor(Math.random() * 99999999)
+    const remetente = await nodemailer.createTransport({
+        host: "smtp.office365.com", // hostname
+        secureConnection: false, // TLS requires secureConnection to be false
+        port: 587, // port for secure SMTP
+        tls: {
+            ciphers: 'SSLv3'
+        },
+        auth: {
+            user: 'login.escola@outlook.com',
+            pass: 'Bv759236'
+        }
+    })
 
-            const emailOrigin = {
-                from: 'login.escola@outlook.com',
-                to: email,
-                subject: 'Your Code',
-                text: `Your code is ${code}`,
-            }
+    const email = {
+        from: 'login.escola@outlook.com',
+        to: emailForms,
+        subject: 'Your Code',
+        text: `Your code is ${code}`,
+    }
 
-            await remetente.sendEmail(emailOrigin, function (error) {
-                console.log('#############')
-                if (error) {
-                    console.log(error)
-                    return res.status(400).json(errorM('Error sending email'))
-                }
-            })
+    await remetente.sendMail(email, function (error) {
+        if (error) {
+            console.log(error)
+        }
+    })
 
-            const token = jwt.sign({ email, code }, 'TokenEmail', { expiresIn: '1h' }) //TODO: substituir por dotenv e o tempo de espera
-            res.status(200).json(token)
-        })
-        .catch(err => {
-            return res.status(400).json(errorM('Error sending email or user not found'))
-        })
+    const token = jwt.sign({ emailForms, code }, 'FHddvve    svcssss   fows11w1 1288#$%c', { expiresIn: '1h' }) //TODO: substituir por dotenv e o tempo de espera
+    res.status(200).json(['Email sent successfully!', token])
 }
+
 
 export {
     signIn,
