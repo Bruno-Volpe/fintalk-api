@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer'
 const signIn = async (req, res) => {
     const { email, password } = req.body
     if (!email || !password) {
-        return res.status(400).json(errorM('User or password not informed'))
+        return res.status(404).json(errorM('User or password not informed'))
     }
     await Users.findOne({ where: { email } })
         .then(user => {
@@ -37,15 +37,15 @@ const signIn = async (req, res) => {
 const signUp = async (req, res) => {
     const { email, password } = req.body
     if (!email || !password) {
-        return res.status(400).json(errorM('User or password not informed'))
+        return res.status(404).json(errorM('User or password not informed'))
     } else if (password.length < 6) {
-        return res.status(400).json(errorM('Password must be at least 6 characters'))
+        return res.status(404).json(errorM('Password must be at least 6 characters'))
     }
 
     await Users.findOne({ where: { email } })
         .then(user => {
             if (user) {
-                return res.status(400).json(errorM('User already exists'))
+                return res.status(409).json(errorM('User already exists'))
             }
             // Create password using bcrypt
             bcrypt.hash(password, 10, (err, hash) => {
@@ -57,7 +57,7 @@ const signUp = async (req, res) => {
                         return res.json(user)
                     })
                     .catch(err => {
-                        return res.status(400).json(errorM(err.errors.map(error => error.message)))
+                        return res.status(400).json(errorM((err.message.split('Validation error: '))[1]))
                     })
             })
         })
@@ -104,7 +104,7 @@ const sendEmail = async (req, res) => {
     })
 
     const token = jwt.sign({ emailForms, code }, 'SendCodeToken', { expiresIn: '1h' }) //TODO: substituir por dotenv e o tempo de espera
-    res.status(200).json(['Email sent successfully!', token])
+    res.status(200).json({ token })
 }
 
 const checkCode = async (req, res) => {
