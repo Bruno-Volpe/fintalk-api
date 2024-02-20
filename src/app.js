@@ -9,7 +9,7 @@ dotenv.config();
 
 const whiteList = [
     'http://localhost:3000',
-    'https://ligeirinho.netlify.app/'
+    'https://ligeirinho.netlify.app'
 ];
 
 const corsOptions = {
