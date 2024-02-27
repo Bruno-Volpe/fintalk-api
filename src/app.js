@@ -6,6 +6,8 @@ import cors from 'cors';
 import loginRouter from './routes/login';
 import customersRouter from './routes/customers';
 
+import loginRequired from './middlewares/loginRequired';
+
 dotenv.config();
 
 const whiteList = [
@@ -38,7 +40,7 @@ class App {
 
     routes() {
         this.app.use('/login', loginRouter)
-        this.app.use('/customers', customersRouter)
+        this.app.use('/customers', loginRequired, customersRouter)
     }
 }
 
