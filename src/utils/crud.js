@@ -1,4 +1,12 @@
-const errorM = require('./errorM');
+import errorM from './errorM';
+
+function checkForId(req) {
+  const id = req.params.id;
+  console.log(id);
+  if (!id) return res.status(401).json(errorM('ID nao enviado'));
+
+  return id
+}
 
 async function storeObject(req, res, model) {
   try {
@@ -13,8 +21,7 @@ async function storeObject(req, res, model) {
 
 async function removeObject(req, res, model) {
   try {
-    const id = req.params.id;
-    if (!id) return res.status(401).json(errorM('ID não enviado'));
+    const id = checkForId(req);
 
     const modelObject = await model.findByPk(id);
     if (!modelObject) return res.status(404).json(errorM('User não encontrado'));
@@ -27,8 +34,10 @@ async function removeObject(req, res, model) {
   }
 }
 
-async function updateObject(req, res, model, id) {
+async function updateObject(req, res, model) {
   try {
+    const id = checkForId(req);
+
     const oldModelObject = await model.findByPk(id);
     if (!oldModelObject) return res.status(404).json(errorM('User não encontrado'));
 
@@ -41,17 +50,17 @@ async function updateObject(req, res, model, id) {
   }
 }
 
-async function showObject(req, res, model, include) {
+async function showObject(req, res, model, include = null) {
   try {
     const id = req.params.id;
     if (!id) return res.status(401).json(errorM('ID nao enviado'));
 
     const modelObject = await model.findByPk(id, { include });
-    if (!modelObject) return res.status(404).json(errorM('Model não encontrado'));
+    if (!modelObject) return res.status(404).json(errorM('User não encontrado'));
     res.status(200).json(modelObject);
   } catch (e) {
     res.status(400).json({
-      errors: e.errors.map((err) => err.message),
+      errors: e.errors?.map((err) => err.message) || [{ message: e.message }],
     });
   }
 }
