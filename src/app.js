@@ -4,6 +4,7 @@ import './database';
 import cors from 'cors';
 
 import loginRouter from './routes/login';
+import customersRouter from './routes/customers';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ class App {
 
     routes() {
         this.app.use('/login', loginRouter)
+        this.app.use('/customers', customersRouter)
     }
 }
 
