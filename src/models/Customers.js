@@ -1,5 +1,4 @@
 import Sequelize, { Model } from 'sequelize';
-
 export default class Customers extends Model {
     static init(sequelize) {
         super.init({
@@ -13,6 +12,15 @@ export default class Customers extends Model {
                     len: {
                         args: [3, 255],
                         msg: "The full name field must be between 3 and 255 characters"
+                    }
+                }
+            },
+            user_id: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                validate: {
+                    notEmpty: {
+                        msg: "Must have a user related"
                     }
                 }
             },
@@ -70,5 +78,7 @@ export default class Customers extends Model {
         return this
     }
 
-    static associate(models) { }
+    static associate(models) {
+        this.belongsTo(models.Users, { foreignKey: 'user_id' });
+    }
 }

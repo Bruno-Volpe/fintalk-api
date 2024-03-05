@@ -32,5 +32,8 @@ export default class Users extends Model {
         return this;
     }
 
-    static associate(models) { }
+
+    static associate(models) {
+        this.hasOne(models.Customers, { foreignKey: 'user_id' });
+    }
 }
