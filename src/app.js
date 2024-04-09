@@ -5,7 +5,7 @@ import cors from 'cors';
 
 import loginRouter from './routes/login';
 import customersRouter from './routes/customers';
-import profileRouter from './routes/profiles';
+//import profileRouter from './routes/profiles';
 
 import loginRequired from './middlewares/loginRequired';
 
@@ -48,7 +48,7 @@ class App {
     routes() {
         this.app.use('/login', loginRouter)
         this.app.use('/customers', loginRequired, customersRouter)
-        this.app.use('/profiles', loginRequired, profileRouter)
+        // this.app.use('/profiles', loginRequired, profileRouter)
     }
 }
 
