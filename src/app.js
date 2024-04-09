@@ -5,23 +5,30 @@ import cors from 'cors';
 
 import loginRouter from './routes/login';
 import customersRouter from './routes/customers';
+import profileRouter from './routes/profiles';
 
 import loginRequired from './middlewares/loginRequired';
 
 dotenv.config();
 
-const whiteList = [
-    'http://localhost:3000',
-    'https://ligeirinho.netlify.app'
-];
+// const whiteList = [
+//     'http://localhost:3000',
+//     'https://ligeirinho.netlify.app',
+// ];
+
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         if (origin && whiteList.indexOf(origin) !== -1 || !origin) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS!'));
+//         }
+//     }
+// };
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (origin && whiteList.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS!'));
-        }
+        callback(null, true);
     }
 };
 
@@ -41,6 +48,7 @@ class App {
     routes() {
         this.app.use('/login', loginRouter)
         this.app.use('/customers', loginRequired, customersRouter)
+        this.app.use('/profiles', loginRequired, profileRouter)
     }
 }
 
