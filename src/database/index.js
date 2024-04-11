@@ -3,8 +3,9 @@ import databaseConfig from '../config/database'
 
 import Users from '../models/Users'
 import Customers from '../models/Customers'
+import Agendas from '../models/Agendas'
 
-const models = [Users, Customers]
+const models = [Users, Customers, Agendas]
 
 const connection = new Sequileze(databaseConfig)
 
