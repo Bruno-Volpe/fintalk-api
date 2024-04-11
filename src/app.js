@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import loginRouter from './routes/login';
 import customersRouter from './routes/customers';
+import agendaRouter from './routes/agenda';
 //import profileRouter from './routes/profiles';
 
 import loginRequired from './middlewares/loginRequired';
@@ -48,6 +49,7 @@ class App {
     routes() {
         this.app.use('/login', loginRouter)
         this.app.use('/customers', loginRequired, customersRouter)
+        this.app.use('/agenda', loginRequired, agendaRouter)
         // this.app.use('/profiles', loginRequired, profileRouter)
     }
 }
