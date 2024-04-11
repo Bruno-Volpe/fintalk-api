@@ -49,7 +49,7 @@ class App {
     routes() {
         this.app.use('/login', loginRouter)
         this.app.use('/customers', loginRequired, customersRouter)
-        this.app.use('/agenda', loginRequired, agendaRouter)
+        this.app.use('/agenda', agendaRouter)
         // this.app.use('/profiles', loginRequired, profileRouter)
     }
 }
